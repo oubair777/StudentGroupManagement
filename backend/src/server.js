@@ -38,11 +38,11 @@ async function startServer() {
     }
 
     app.listen(PORT, () => {
-      console.log(`====================================================`);
+  
       console.log(`🎉 Joineazy Backend Server running on port ${PORT}`);
       console.log(`🌐 Base URL: http://localhost:${PORT}/api`);
       console.log(`📊 DB Engine: ${db.getDbType().toUpperCase()}`);
-      console.log(`====================================================`);
+
     });
   } catch (err) {
     console.error('❌ Failed to start server:', err);

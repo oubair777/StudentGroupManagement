@@ -8,7 +8,13 @@
     "dev": "node --watch src/server.js",
     "seed": "node src/db/seed.js"
   },
-  "keywords": ["express", "postgresql", "jwt", "joineazy", "group-management"],
+  "keywords": [
+    "express",
+    "postgresql",
+    "jwt",
+    "joineazy",
+    "group-management"
+  ],
   "author": "Full Stack Intern",
   "license": "ISC",
   "dependencies": {
@@ -18,6 +24,7 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "pdfkit": "^0.21.0",
     "pg": "^8.11.5",
     "sqlite3": "^5.1.7"
   }
