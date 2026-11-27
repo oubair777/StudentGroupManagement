@@ -107,7 +107,7 @@ function buildPdf(outputPath) {
   drawDeliverableCard(
     '2',
     'Working Demo Video (Walkthrough & Feature Demonstration)',
-    'https://drive.google.com/file/d/1htvhpDxPa0vT9eRtYG67SaEW-JlOrHUX/view',
+    'https://drive.google.com/file/d/14E3NX3eaC39VNIWsZ5nhXVBuPNFD4PJr/view?usp=sharing',
     'Video demonstration showcasing responsive UI, courses grid, group leader submission locking, and admin analytics.'
   );
 
@@ -117,13 +117,6 @@ function buildPdf(outputPath) {
     'Local Platform (Docker): http://localhost:3000',
     'Instant 1-command startup: `docker-compose up --build`. Zero configuration required; dual PostgreSQL & SQLite support.',
     false
-  );
-
-  drawDeliverableCard(
-    '4',
-    'Official Submission Form Link',
-    'https://forms.gle/tx7xZnZ3e7j1pdeG8',
-    'Submission form for Task - 2 (Candidate: Mohammad Oubair Shareef).'
   );
 
   // 5. Round 2 Architecture Highlights
@@ -190,11 +183,6 @@ function buildPdf(outputPath) {
      .text('bella@joineazy.edu', 180, credY + 42)
      .text('student123', 320, credY + 42)
      .text('Alpha Architects (CS-301)', 405, credY + 42);
-
-  // Footer
-  doc.y = 780;
-  doc.fillColor(SLATE_MUTED).fontSize(7.5).font('Helvetica')
-     .text('Candidate: Mohammad Oubair Shareef  •  Joineazy Full Stack Assessment Round 2  •  Generated November 2026', 45, 780, { align: 'center', width: 505 });
 
   doc.end();
 

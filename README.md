@@ -1,6 +1,9 @@
 # Joineazy: Student, Group & Course Assignment Management System
 ## Round 2: Enhanced UI/UX, Course-Driven Architecture & Group Leader Workflow
 
+> **📹 Round 2 Demo Walkthrough Video:** [Watch on Google Drive](https://drive.google.com/file/d/14E3NX3eaC39VNIWsZ5nhXVBuPNFD4PJr/view?usp=sharing)  
+> **Candidate:** Mohammad Oubair Shareef (`oubairshareef7860@gmail.com`)
+
 A full-stack, enterprise-grade academic platform built with **React 18 + Tailwind CSS, Node.js + Express, and PostgreSQL** (containerized with **Docker**).
 
 Designed for modern collaborative education, this system powers structured course enrollments, team formation, OneDrive deliverable tracking, a rigorous **two-step submission verification system**, and an automated **Group Leader Acknowledgment Workflow**.
