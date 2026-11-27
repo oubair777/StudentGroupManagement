@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navbar';
 
 // Auth Pages
@@ -9,6 +10,7 @@ import Register from './pages/Register';
 
 // Student Pages
 import StudentDashboard from './pages/student/StudentDashboard';
+import CourseAssignments from './pages/student/CourseAssignments';
 import StudentAssignments from './pages/student/StudentAssignments';
 import StudentGroups from './pages/student/StudentGroups';
 
@@ -64,32 +66,41 @@ function RootRedirect() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <div className="min-h-screen bg-slate-50 flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
-          <Navbar />
-          <main className="flex-1">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+      <ToastProvider>
+        <BrowserRouter>
+          <div className="min-h-screen bg-slate-50 flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-              {/* Student Routes */}
-              <Route
-                path="/student/dashboard"
-                element={
-                  <ProtectedRoute allowedRoles={['student']}>
-                    <StudentDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/student/assignments"
-                element={
-                  <ProtectedRoute allowedRoles={['student']}>
-                    <StudentAssignments />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Student Routes */}
+                <Route
+                  path="/student/dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={['student']}>
+                      <StudentDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/student/courses/:courseId"
+                  element={
+                    <ProtectedRoute allowedRoles={['student']}>
+                      <CourseAssignments />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/student/assignments"
+                  element={
+                    <ProtectedRoute allowedRoles={['student']}>
+                      <StudentAssignments />
+                    </ProtectedRoute>
+                  }
+                />
               <Route
                 path="/student/groups"
                 element={
@@ -140,6 +151,7 @@ export default function App() {
           </main>
         </div>
       </BrowserRouter>
+      </ToastProvider>
     </AuthProvider>
   );
 }

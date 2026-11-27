@@ -1,368 +1,341 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import StatsCard from '../../components/StatsCard';
 import ProgressBar from '../../components/ProgressBar';
-import TwoStepSubmissionModal from '../../components/TwoStepSubmissionModal';
 import { 
   BookOpen, 
   CheckCircle2, 
   Clock, 
   Users, 
-  FolderSync, 
-  ExternalLink, 
   ArrowRight,
-  ShieldCheck,
-  AlertCircle,
-  Award
+  Award,
+  GraduationCap,
+  Sparkles,
+  LayoutGrid,
+  Calendar,
+  Layers
 } from 'lucide-react';
 
 export default function StudentDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [courses, setCourses] = useState([]);
   const [analytics, setAnalytics] = useState(null);
-  const [assignments, setAssignments] = useState([]);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAssignment, setSelectedAssignment] = useState(null);
-
-  const fetchData = async () => {
-    try {
-      const [analyticsRes, assignmentsRes, groupsRes] = await Promise.all([
-        api.get('/analytics/student'),
-        api.get('/assignments'),
-        api.get('/groups/my'),
-      ]);
-
-      if (analyticsRes.data.success) setAnalytics(analyticsRes.data);
-      if (assignmentsRes.data.success) setAssignments(assignmentsRes.data.assignments);
-      if (groupsRes.data.success) setGroups(groupsRes.data.groups);
-    } catch (err) {
-      console.error('Error fetching student dashboard data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [coursesRes, analyticsRes, groupsRes] = await Promise.all([
+          api.get('/courses'),
+          api.get('/analytics/student'),
+          api.get('/groups/my'),
+        ]);
+
+        if (coursesRes.data.success) setCourses(coursesRes.data.courses);
+        if (analyticsRes.data.success) setAnalytics(analyticsRes.data);
+        if (groupsRes.data.success) setGroups(groupsRes.data.groups);
+      } catch (err) {
+        console.error('Error fetching student dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
   }, []);
 
-  const handleSubmitted = () => {
-    fetchData();
-  };
-
   const primaryGroup = groups.length > 0 ? groups[0] : null;
 
+  // Theme color styles for course cards
+  const colorSchemes = {
+    indigo: {
+      border: 'border-indigo-100 hover:border-indigo-300',
+      badge: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+      button: 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700',
+      gradient: 'from-indigo-600 to-indigo-800',
+    },
+    purple: {
+      border: 'border-purple-100 hover:border-purple-300',
+      badge: 'bg-purple-50 text-purple-700 border-purple-200',
+      button: 'bg-purple-50 hover:bg-purple-100 text-purple-700',
+      gradient: 'from-purple-600 to-purple-800',
+    },
+    emerald: {
+      border: 'border-emerald-100 hover:border-emerald-300',
+      badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      button: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700',
+      gradient: 'from-emerald-600 to-emerald-800',
+    },
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-gradient-to-r from-brand-700 via-indigo-700 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-brand-900/10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-300">
+      {/* Welcome Banner */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-gradient-to-r from-brand-700 via-indigo-700 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-indigo-950/10">
         <div className="space-y-1.5">
           <div className="flex items-center space-x-2">
-            <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-semibold backdrop-blur-sm border border-white/10">
+            <span className="px-3 py-1 bg-white/10 rounded-full text-[11px] font-bold backdrop-blur-sm border border-white/10">
               Student Workspace
             </span>
             {user?.student_id && (
-              <span className="text-xs text-brand-200 font-mono">ID: {user.student_id}</span>
+              <span className="text-xs text-brand-200 font-mono font-bold">ID: {user.student_id}</span>
             )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            Hello, {user?.name}! 👋
+            Welcome back, {user?.name}! 👋
           </h1>
-          <p className="text-sm text-indigo-100 max-w-xl">
-            Collaborate in your group, upload deliverables to OneDrive, and verify your assignment submissions.
+          <p className="text-xs sm:text-sm text-indigo-100 max-w-xl font-medium">
+            Access your enrolled courses, collaborate in teams, and track your individual & group submissions.
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2.5">
           <Link
             to="/student/assignments"
-            className="px-4 py-2.5 bg-white text-brand-700 hover:bg-brand-50 font-bold text-sm rounded-xl transition-all shadow-md flex items-center space-x-1.5"
+            className="px-4 py-2.5 bg-white text-brand-700 hover:bg-brand-50 font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center space-x-1.5"
           >
             <BookOpen className="w-4 h-4" />
-            <span>Assignments</span>
+            <span>All Coursework</span>
           </Link>
           <Link
             to="/student/groups"
-            className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm rounded-xl transition-all border border-white/20 flex items-center space-x-1.5"
+            className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all border border-white/20 flex items-center space-x-1.5"
           >
             <Users className="w-4 h-4" />
-            <span>Manage Group</span>
+            <span>My Team</span>
           </Link>
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* KPI Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
-          title="Total Assigned"
-          value={analytics?.personal?.total_assignments || 0}
-          subtitle="Course coursework"
-          icon={BookOpen}
+          title="Enrolled Courses"
+          value={analytics?.personal?.enrolled_courses || courses.length || 0}
+          subtitle="Academic curriculum"
+          icon={LayoutGrid}
           color="indigo"
         />
         <StatsCard
-          title="Confirmed Submissions"
+          title="Assigned Deliverables"
+          value={analytics?.personal?.total_assignments || 0}
+          subtitle="Individual & group tasks"
+          icon={BookOpen}
+          color="purple"
+        />
+        <StatsCard
+          title="Verified Submissions"
           value={analytics?.personal?.completed_count || 0}
-          subtitle="Verified submissions"
+          subtitle="2-Step confirmed"
           icon={CheckCircle2}
           color="emerald"
         />
         <StatsCard
-          title="Pending Action"
-          value={analytics?.personal?.pending_count || 0}
-          subtitle="Awaiting submission"
-          icon={Clock}
+          title="Overall Completion"
+          value={`${analytics?.personal?.completion_rate || 0}%`}
+          subtitle={analytics?.personal?.badge || 'In Progress'}
+          icon={Award}
           color="amber"
         />
-        <StatsCard
-          title="Completion Badge"
-          value={analytics?.personal?.badge || 'In Progress'}
-          subtitle={`${analytics?.personal?.completion_rate || 0}% personal completion`}
-          icon={Award}
-          color="purple"
-        />
       </div>
 
-      {/* Main Grid: Group Progress & Assignments */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Group Status & Progress */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5">
-            <div className="flex justify-between items-center">
-              <h3 className="font-bold text-base text-slate-900 flex items-center space-x-2">
-                <Users className="w-5 h-5 text-brand-600" />
-                <span>My Group Progress</span>
-              </h3>
-              <Link
-                to="/student/groups"
-                className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center space-x-0.5"
-              >
-                <span>Details</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+      {/* Enrolled Courses Section (Requirement 1.2) */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h2 className="text-xl font-extrabold text-slate-900 flex items-center space-x-2">
+              <LayoutGrid className="w-5 h-5 text-brand-600" />
+              <span>Enrolled Courses</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Click any course to view its assignments, deadlines, and submission statuses
+            </p>
+          </div>
+          <span className="text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1 rounded-full border border-brand-200 self-start sm:self-auto">
+            {courses.length} Active Courses
+          </span>
+        </div>
 
-            {primaryGroup ? (
-              <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-brand-50/60 border border-brand-100">
-                  <div className="flex justify-between items-start">
+        {loading ? (
+          <div className="py-16 text-center text-slate-400 text-sm">Loading your enrolled courses...</div>
+        ) : courses.length === 0 ? (
+          <div className="bg-white rounded-3xl p-10 text-center border border-slate-200/80 shadow-sm">
+            <GraduationCap className="w-12 h-12 text-slate-300 mx-auto mb-2" />
+            <h3 className="text-base font-bold text-slate-700">No courses enrolled yet</h3>
+            <p className="text-xs text-slate-400 mt-1">Contact your professor to be enrolled in course units.</p>
+          </div>
+        ) : (
+          /* Responsive Grid of Course Cards */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((course) => {
+              const theme = colorSchemes[course.color_theme] || colorSchemes.indigo;
+
+              return (
+                <div
+                  key={course.id}
+                  onClick={() => navigate(`/student/courses/${course.id}`)}
+                  className={`bg-white rounded-3xl p-6 border ${theme.border} shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col justify-between group transform hover:-translate-y-1`}
+                >
+                  <div className="space-y-4">
+                    {/* Course Code & Department */}
+                    <div className="flex items-center justify-between">
+                      <span className={`px-2.5 py-1 rounded-xl text-xs font-black uppercase tracking-wider border ${theme.badge}`}>
+                        {course.code}
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-400">
+                        {course.semester || 'Fall 2026'}
+                      </span>
+                    </div>
+
+                    {/* Course Title & Description */}
                     <div>
-                      <h4 className="font-bold text-brand-950 text-base">{primaryGroup.name}</h4>
-                      <p className="text-xs text-brand-700/80 mt-0.5 font-mono">
-                        Code: {primaryGroup.code}
+                      <h3 className="text-lg font-black text-slate-900 group-hover:text-brand-600 transition-colors leading-snug">
+                        {course.title}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                        {course.description || 'Comprehensive curriculum with hands-on projects.'}
                       </p>
                     </div>
-                    <span className="px-2 py-0.5 text-[11px] font-bold rounded-full bg-white text-brand-700 border border-brand-200 shadow-sm">
-                      {analytics?.group?.badge || 'Active Group'}
-                    </span>
-                  </div>
 
-                  <div className="mt-4">
-                    <ProgressBar
-                      percentage={analytics?.group?.group_completion_rate || 0}
-                      label="Overall Group Progress"
-                      size="md"
-                      badgeText={`${analytics?.group?.group_completion_rate || 0}%`}
-                    />
-                  </div>
-                </div>
-
-                {/* Group Members List */}
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2.5">
-                    Group Members ({primaryGroup.members?.length || 0})
-                  </span>
-                  <div className="space-y-2">
-                    {primaryGroup.members?.map((mem) => (
-                      <div
-                        key={mem.id}
-                        className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs"
-                      >
-                        <div className="flex items-center space-x-2.5">
-                          <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs">
-                            {mem.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-slate-800 leading-tight">
-                              {mem.name} {mem.id === user.id && <span className="text-brand-600">(You)</span>}
-                            </p>
-                            <p className="text-[10px] text-slate-400">{mem.student_id || mem.email}</p>
-                          </div>
+                    {/* Instructor Info */}
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-[10px]">
+                          {course.instructor_name ? course.instructor_name.charAt(0) : 'P'}
                         </div>
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                            mem.role === 'leader'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-slate-200 text-slate-700'
-                          }`}
-                        >
-                          {mem.role === 'leader' ? 'Leader' : 'Member'}
+                        <span className="font-semibold text-slate-700 truncate max-w-[140px]">
+                          {course.instructor_name || 'Dr. Robert Vance'}
                         </span>
                       </div>
-                    ))}
+                      <span className="text-[11px] font-bold text-slate-500">
+                        {course.assignment_count} Tasks
+                      </span>
+                    </div>
+
+                    {/* Progress Bar (Course Completion) */}
+                    <div className="pt-1">
+                      <ProgressBar
+                        percentage={course.progress_percentage || 0}
+                        label="Course Completion"
+                        size="sm"
+                        badgeText={`${course.completed_assignments || 0}/${course.assignment_count || 0}`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card Bottom Action */}
+                  <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-brand-600 group-hover:text-brand-700">
+                    <span>View Course Assignments</span>
+                    <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center py-6 space-y-3">
-                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
-                  <Users className="w-6 h-6" />
-                </div>
-                <p className="text-sm font-semibold text-slate-700">You haven't joined a group yet</p>
-                <p className="text-xs text-slate-400 max-w-xs mx-auto">
-                  Create a new group or invite other students to collaborate on assignments.
-                </p>
-                <Link
-                  to="/student/groups"
-                  className="inline-block px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl transition-colors shadow-sm"
-                >
-                  Create or Join Group
-                </Link>
-              </div>
-            )}
+              );
+            })}
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Right Column: Assignments Overview */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-bold text-base text-slate-900 flex items-center space-x-2">
-                  <BookOpen className="w-5 h-5 text-brand-600" />
-                  <span>Assignments & Submissions</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Confirm your OneDrive upload with two-step verification
-                </p>
+      {/* Group & Quick Assignments Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Group Quick Card */}
+        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="font-bold text-base text-slate-900 flex items-center space-x-2">
+              <Users className="w-5 h-5 text-brand-600" />
+              <span>My Collaboration Group</span>
+            </h3>
+            <Link to="/student/groups" className="text-xs font-bold text-brand-600 hover:text-brand-700">
+              Details →
+            </Link>
+          </div>
+
+          {primaryGroup ? (
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl bg-brand-50/60 border border-brand-100">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-black text-brand-950 text-base">{primaryGroup.name}</h4>
+                    <p className="text-[11px] text-brand-700 font-mono mt-0.5 font-bold">
+                      Code: {primaryGroup.code}
+                    </p>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${primaryGroup.my_role === 'leader' ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-700'}`}>
+                    {primaryGroup.my_role === 'leader' ? '★ Group Leader' : 'Team Member'}
+                  </span>
+                </div>
+
+                <div className="mt-3">
+                  <ProgressBar
+                    percentage={analytics?.group?.group_completion_rate || 0}
+                    label="Team Progress"
+                    size="sm"
+                  />
+                </div>
               </div>
-              <Link
-                to="/student/assignments"
-                className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center space-x-0.5"
-              >
-                <span>View All</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                  Team Roster ({primaryGroup.members?.length || 0})
+                </span>
+                {primaryGroup.members?.map((m) => (
+                  <div key={m.id} className="flex justify-between items-center p-2 rounded-xl bg-slate-50 text-xs">
+                    <span className="font-semibold text-slate-800">
+                      {m.name} {m.id === user.id && <span className="text-brand-600">(You)</span>}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">{m.role}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-6 text-slate-400 text-xs">
+              No active group yet.{' '}
+              <Link to="/student/groups" className="text-brand-600 font-bold underline">
+                Create one now
               </Link>
             </div>
+          )}
+        </div>
 
-            <div className="space-y-4">
-              {assignments.length === 0 ? (
-                <div className="text-center py-10 text-slate-400 text-sm">
-                  No assignments posted yet.
-                </div>
-              ) : (
-                assignments.slice(0, 3).map((asgn) => (
-                  <div
-                    key={asgn.id}
-                    className="p-5 rounded-2xl border border-slate-200/80 hover:border-brand-200 bg-white hover:bg-slate-50/50 transition-all space-y-3"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                              asgn.target_type === 'specific_groups'
-                                ? 'bg-purple-100 text-purple-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}
-                          >
-                            {asgn.target_type === 'specific_groups' ? 'Group Targeted' : 'All Students'}
-                          </span>
-                          <span className="text-xs text-slate-400 flex items-center space-x-1">
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>
-                              Due: {new Date(asgn.due_date).toLocaleDateString(undefined, {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                              })}
-                            </span>
-                          </span>
-                        </div>
-                        <h4 className="font-bold text-slate-900 text-base mt-1">{asgn.title}</h4>
-                      </div>
+        {/* System Features Card */}
+        <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="font-bold text-base text-slate-900 flex items-center space-x-2">
+              <Sparkles className="w-5 h-5 text-amber-500" />
+              <span>Round 2 Features Active</span>
+            </h3>
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              Enhanced System
+            </span>
+          </div>
 
-                      {/* Status Badge */}
-                      <div>
-                        {asgn.is_submitted ? (
-                          <span className="inline-flex items-center space-x-1 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Confirmed</span>
-                          </span>
-                        ) : asgn.status === 'overdue' ? (
-                          <span className="inline-flex items-center space-x-1 px-3 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-full text-xs font-bold">
-                            <AlertCircle className="w-3.5 h-3.5" />
-                            <span>Overdue</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center space-x-1 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-bold">
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>Pending</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+              <span className="text-xs font-bold text-slate-900 flex items-center space-x-1.5">
+                <LayoutGrid className="w-4 h-4 text-brand-600" />
+                <span>Course-Driven Curriculum</span>
+              </span>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Assignments are now organized cleanly by course code (CS-301, CS-402, CS-505) with click-through pages.
+              </p>
+            </div>
 
-                    <p className="text-xs text-slate-600 line-clamp-2">{asgn.description}</p>
-
-                    {/* Group Progress for this assignment */}
-                    {asgn.group_progress && (
-                      <div className="pt-2 border-t border-slate-100">
-                        <ProgressBar
-                          percentage={asgn.group_progress.completion_percent}
-                          label={`Group Progress (${asgn.group_progress.submitted_members}/${asgn.group_progress.total_members} members confirmed)`}
-                          size="sm"
-                        />
-                      </div>
-                    )}
-
-                    {/* Action buttons */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
-                      <a
-                        href={asgn.onedrive_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
-                      >
-                        <FolderSync className="w-3.5 h-3.5" />
-                        <span>OneDrive Submission Folder</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-
-                      {!asgn.is_submitted ? (
-                        <button
-                          onClick={() => setSelectedAssignment(asgn)}
-                          className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center space-x-1.5"
-                        >
-                          <ShieldCheck className="w-3.5 h-3.5" />
-                          <span>Verify & Confirm Submission</span>
-                        </button>
-                      ) : (
-                        <span className="text-[11px] text-emerald-600 font-semibold flex items-center space-x-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>
-                            Submitted on {new Date(asgn.submission.submitted_at).toLocaleDateString()}
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+              <span className="text-xs font-bold text-slate-900 flex items-center space-x-1.5">
+                <Users className="w-4 h-4 text-purple-600" />
+                <span>Group Leader Acknowledgment</span>
+              </span>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                For team coursework, only group leaders can submit, instantly propagating acknowledgment to all members.
+              </p>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Two-Step Submission Verification Modal */}
-      <TwoStepSubmissionModal
-        assignment={selectedAssignment}
-        isOpen={!!selectedAssignment}
-        onClose={() => setSelectedAssignment(null)}
-        onSubmitted={handleSubmitted}
-      />
     </div>
   );
 }

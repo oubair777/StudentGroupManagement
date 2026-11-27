@@ -11,8 +11,7 @@ import {
   TrendingUp, 
   Award, 
   Calendar,
-  Sparkles,
-  PieChart
+  LayoutGrid
 } from 'lucide-react';
 
 export default function AdminAnalytics() {
@@ -45,55 +44,96 @@ export default function AdminAnalytics() {
   }
 
   const summary = data?.summary || {};
+  const courseBreakdown = data?.course_breakdown || [];
   const assignmentStats = data?.assignment_stats || [];
   const groupPerformance = data?.group_performance || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-300">
       {/* Page Title */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center space-x-2.5">
           <BarChart3 className="w-8 h-8 text-purple-600" />
-          <span>Academic Analytics & Group Performance</span>
+          <span>Curriculum Analytics & Team Performance</span>
         </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Visual metrics on submission completion rates, group performance rankings, and student engagement.
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          Visual insights into course completion ratios, task submissions, and collaborative group rankings.
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatsCard
-          title="Overall Submission Rate"
-          value={`${summary.overall_completion_rate || 0}%`}
-          subtitle="Course-wide aggregate"
-          icon={TrendingUp}
+          title="Active Courses"
+          value={summary.total_courses || 0}
+          subtitle="Taught curriculum"
+          icon={LayoutGrid}
           color="indigo"
         />
         <StatsCard
-          title="Total Submissions"
+          title="Total Students"
+          value={summary.total_students || 0}
+          subtitle="Enrolled cohort"
+          icon={Users}
+          color="purple"
+        />
+        <StatsCard
+          title="Deliverables"
+          value={summary.total_assignments || 0}
+          subtitle="Tasks assigned"
+          icon={BookOpen}
+          color="blue"
+        />
+        <StatsCard
+          title="Verified Submissions"
           value={summary.total_submissions || 0}
-          subtitle="2-Step verified"
+          subtitle="Total completed"
           icon={CheckCircle2}
           color="emerald"
         />
         <StatsCard
-          title="Active Groups"
-          value={summary.total_groups || 0}
-          subtitle="Collaborative teams"
-          icon={Layers}
-          color="purple"
-        />
-        <StatsCard
-          title="Active Coursework"
-          value={summary.total_assignments || 0}
-          subtitle="Total assignments posted"
-          icon={BookOpen}
+          title="Overall Completion"
+          value={`${summary.overall_completion_rate || 0}%`}
+          subtitle="Cohort average"
+          icon={TrendingUp}
           color="amber"
         />
       </div>
 
-      {/* Charts Grid */}
+      {/* Course-Wise Progress Breakdown Cards */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-black text-slate-900 flex items-center space-x-2">
+          <LayoutGrid className="w-5 h-5 text-purple-600" />
+          <span>Course Completion Overview</span>
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {courseBreakdown.map((c) => (
+            <div key={c.id} className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="px-2.5 py-1 bg-purple-50 text-purple-800 rounded-xl text-xs font-black uppercase">
+                  {c.code}
+                </span>
+                <span className="text-[11px] font-semibold text-slate-400">{c.semester}</span>
+              </div>
+              <h3 className="text-sm font-black text-slate-900">{c.title}</h3>
+              <p className="text-[11px] text-slate-500">
+                {c.student_count} Students &bull; {c.assignment_count} Tasks &bull; {c.group_count} Groups
+              </p>
+              <div className="pt-2">
+                <ProgressBar
+                  percentage={c.completion_rate}
+                  label="Submission Rate"
+                  size="sm"
+                  badgeText={`${c.confirmed_submissions} Submissions`}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Charts Grid: Assignment Progress & Group Rankings */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Chart 1: Assignment Submission Completion Breakdown */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
@@ -101,27 +141,33 @@ export default function AdminAnalytics() {
             <div>
               <h3 className="font-bold text-lg text-slate-900 flex items-center space-x-2">
                 <BookOpen className="w-5 h-5 text-purple-600" />
-                <span>Assignment Completion Rates</span>
+                <span>Deliverable Completion Rates</span>
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Confirmed student submissions compared against cohort size
+                Confirmed student and leader submissions per assignment
               </p>
             </div>
             <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
-              {assignmentStats.length} Assignments
+              {assignmentStats.length} Tasks
             </span>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-4">
             {assignmentStats.map((asgn) => (
-              <div key={asgn.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2.5">
+              <div key={asgn.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-bold text-sm text-slate-900">{asgn.title}</h4>
-                    <span className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
-                      <Calendar className="w-3 h-3" />
-                      <span>Due: {new Date(asgn.due_date).toLocaleDateString()}</span>
-                    </span>
+                    <div className="flex items-center space-x-1.5">
+                      {asgn.course_code && (
+                        <span className="px-1.5 py-0.5 bg-slate-200 text-slate-800 rounded text-[10px] font-bold">
+                          {asgn.course_code}
+                        </span>
+                      )}
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${asgn.submission_type === 'group' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                        {asgn.submission_type}
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-xs text-slate-900 mt-1">{asgn.title}</h4>
                   </div>
                   <span
                     className={`px-2 py-0.5 rounded text-[10px] font-bold ${
@@ -136,10 +182,9 @@ export default function AdminAnalytics() {
                   </span>
                 </div>
 
-                {/* Progress bar */}
                 <ProgressBar
                   percentage={asgn.completion_rate}
-                  size="md"
+                  size="sm"
                   label={`${asgn.confirmed_count} of ${asgn.expected_count} submitted`}
                   badgeText={`${asgn.completion_rate}%`}
                 />
@@ -154,10 +199,10 @@ export default function AdminAnalytics() {
             <div>
               <h3 className="font-bold text-lg text-slate-900 flex items-center space-x-2">
                 <Award className="w-5 h-5 text-amber-500" />
-                <span>Group Performance Ranking</span>
+                <span>Team Performance Ranking</span>
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Team completion scores and performance badges
+                Collaborative team completion scores and performance badges
               </p>
             </div>
             <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
@@ -169,7 +214,7 @@ export default function AdminAnalytics() {
             {groupPerformance.map((grp, index) => (
               <div
                 key={grp.id}
-                className="p-4 rounded-2xl border border-slate-200/80 bg-white hover:bg-slate-50/50 transition-all space-y-3"
+                className="p-4 rounded-2xl border border-slate-200/80 bg-white hover:bg-slate-50/50 transition-all space-y-2.5"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -177,15 +222,15 @@ export default function AdminAnalytics() {
                       #{index + 1}
                     </span>
                     <div>
-                      <h4 className="font-bold text-sm text-slate-900">{grp.name}</h4>
-                      <p className="text-[11px] text-slate-400">
-                        {grp.member_count} members • {grp.confirmed_submissions} submissions
+                      <h4 className="font-bold text-xs text-slate-900">{grp.name}</h4>
+                      <p className="text-[10px] text-slate-400">
+                        Course: {grp.course_code} &bull; Leader: {grp.leader_name} &bull; {grp.member_count} members
                       </p>
                     </div>
                   </div>
 
                   <span
-                    className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                       grp.badge_color === 'emerald'
                         ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         : grp.badge_color === 'blue'
